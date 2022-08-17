@@ -10,7 +10,7 @@ from sys import platform
 import time
 
 
-UDP = True
+UDP = False
 
 
 def request_message_interval(message_id: int, frequency_hz: float):
