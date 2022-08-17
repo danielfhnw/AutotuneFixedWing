@@ -14,6 +14,9 @@ if platform == "win32":
 else:
     master = mavutil.mavlink_connection("/dev/serial0", baud=57600)
     
+master.wait_heartbeat()
+print("connected")
+
 msg = master.recv_match(type='BATTERY_STATUS', blocking=True)
 print(msg)
 
