@@ -9,17 +9,22 @@ import pickle
 from matplotlib import pyplot as plt
 
 
-with open("log.pickle", "rb") as fp:
-    log = pickle.load(fp)
-    
+def pickleLoader(pklFile):
+    try:
+        while True:
+            yield pickle.load(pklFile)
+    except EOFError:
+        pass
+
+
 roll = []
 time = []
 
-
-for msg in log:
-    if msg.get_type() == "ATTITUDE":
-        roll.append(msg.roll)
-        time.append(msg.time_boot_ms)
+with open("log.pickle", "rb") as fp:
+    for msg in pickleLoader(fp):
+        if msg.get_type() == "ATTITUDE":
+            roll.append(msg.roll)
+            time.append(msg.time_boot_ms)
         
 
 plt.plot(time,roll,'.')

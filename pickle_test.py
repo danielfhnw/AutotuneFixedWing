@@ -51,19 +51,14 @@ request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW, 1000)
 i = 0
 t = time.time()
 
-log = []
-
-while i < 1000:
-    msg = master.recv_match(type=['ATTITUDE', 'SERVO_OUTPUT_RAW'], blocking=True)
-    log.append(msg)
-    i = i+1
+with open("log.pickle", 'wb') as f:
+    while i < 1000:
+        msg = master.recv_match(type=['ATTITUDE', 'SERVO_OUTPUT_RAW'], blocking=True)
+        i = i+1
+        pickle.dump(msg, f)
 
 freq = 1000 / (time.time()-t)
 print(f"Frequency: {freq} Hz")
 
 master.close()
 
-with open("log.pickle", 'wb') as f:
-    # indent=2 is not needed but makes the file human-readable 
-    # if the data is nested
-    pickle.dump(log, f)
