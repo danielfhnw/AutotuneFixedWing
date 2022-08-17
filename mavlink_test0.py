@@ -10,6 +10,9 @@ from sys import platform
 import time
 
 
+UDP = True
+
+
 def request_message_interval(message_id: int, frequency_hz: float):
     """
     Request MAVLink message in a desired frequency,
@@ -39,6 +42,8 @@ def request_message_interval(message_id: int, frequency_hz: float):
 
 if platform == "win32":
     master = mavutil.mavlink_connection("COM4")
+elif UDP:
+    master = mavutil.mavlink_connection("udp:127.0.0.1:3000", baud=57600)
 else:
     master = mavutil.mavlink_connection("/dev/serial0", baud=57600)
     
