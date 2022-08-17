@@ -43,9 +43,9 @@ def request_message_interval(message_id: int, frequency_hz: float):
 if platform == "win32":
     master = mavutil.mavlink_connection("COM4")
 elif UDP:
-    master = mavutil.mavlink_connection("udp:127.0.0.1:3000", baud=921600)
+    master = mavutil.mavlink_connection("udp:127.0.0.1:3000", baud=57600)
 else:
-    master = mavutil.mavlink_connection("/dev/serial0", baud=921600)
+    master = mavutil.mavlink_connection("/dev/serial0", baud=57600)
     
 master.wait_heartbeat()
 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 1000)
