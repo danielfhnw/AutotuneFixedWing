@@ -49,14 +49,12 @@ else:
     
 master.wait_heartbeat()
 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 1000)
-request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE_TARGET, 1000)
 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW, 1000)
-request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_RC_CHANNELS_RAW, 10)
-request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_HEARTBEAT, 10)
+#request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_RC_CHANNELS_RAW, 10)
+#request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_HEARTBEAT, 10)
 
 
 att_i = 0
-att_t_i = 0
 servo_i = 0
 heart_i = 0
 rc_chan_i = 0
