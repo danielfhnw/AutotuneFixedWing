@@ -62,13 +62,11 @@ rc_chan_i = 0
 t = time.time()
 
 while att_i < 1000:
-    msg = master.recv_match(type=['ATTITUDE', 'ATTITUDE_TARGET', 'RC_CHANNELS_RAW',
+    msg = master.recv_match(type=['ATTITUDE', 'RC_CHANNELS_RAW',
                                   'HEARTBEAT','SERVO_OUTPUT_RAW'])
     if msg is not None:
         if msg.get_type() == 'ATTITUDE':
             att_i += 1
-        elif msg.get_type() == 'ATTITUDE_TARGET':
-            att_t_i += 1
         elif msg.get_type() == 'SERVO_OUTPUT_RAW':
             servo_i += 1
         elif msg.get_type() == 'HEARTBEAT':
