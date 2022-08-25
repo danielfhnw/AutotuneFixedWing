@@ -75,7 +75,6 @@ while att_i < 1000:
             rc_chan_i += 1
 
 print(f"Frequency Attitude: {att_i / (time.time()-t)} Hz")
-print(f"Frequency Attitude Target: {att_t_i / (time.time()-t)} Hz")
 print(f"Frequency Servo Output Raw: {servo_i / (time.time()-t)} Hz")
 print(f"Frequency Heartbeat: {heart_i / (time.time()-t)} Hz")
 print(f"Frequency RC Channels: {rc_chan_i / (time.time()-t)} Hz")
