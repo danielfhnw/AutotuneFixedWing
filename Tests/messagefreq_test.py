@@ -43,12 +43,17 @@ def request_message_interval(message_id: int, frequency_hz: float):
 if platform == "win32":
     master = mavutil.mavlink_connection("COM4")
 elif UDP:
-    master = mavutil.mavlink_connection("udp:127.0.0.1:3000", baud=500000)
+    master = mavutil.mavlink_connection("udp:127.0.0.1:3000", baud=1000000)
 else:
-    master = mavutil.mavlink_connection("/dev/serial0", baud=500000)
+    master = mavutil.mavlink_connection("/dev/serial0", baud=1000000)
     
 master.wait_heartbeat()
 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 1000)
+request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE_TARGET, 1000)
+request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW, 1000)
+request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_RC_CHANNELS_RAW, 10)
+request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_HEARTBEAT, 10)
+
 
 att_i = 0
 att_t_i = 0
@@ -62,11 +67,16 @@ while att_i < 1000:
     msg = master.recv_match(type=['ATTITUDE', 'ATTITUDE_TARGET', 'RC_CHANNELS_RAW',
                                   'HEARTBEAT','SERVO_OUTPUT_RAW'])
     if msg is not None:
-        att_i += 1
-        att_t_i += 1
-        servo_i += 1
-        heart_i += 1
-        rc_chan_i += 1
+        if msg.get_type() == 'ATTITUDE':
+            att_i += 1
+        elif msg.get_type() == 'ATTITUDE_TARGET':
+            att_t_i += 1
+        elif msg.get_type() == 'SERVO_OUTPUT_RAW':
+            servo_i += 1
+        elif msg.get_type() == 'HEARTBEAT':
+            heart_i += 1
+        elif msg.get_type() == 'RC_CHANNELS_RAW':
+            rc_chan_i += 1
 
 print(f"Frequency Attitude: {att_i / (time.time()-t)} Hz")
 print(f"Frequency Attitude Target: {att_t_i / (time.time()-t)} Hz")

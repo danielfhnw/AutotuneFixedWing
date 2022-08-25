@@ -10,7 +10,7 @@ from sys import platform
 import pickle
 
 
-UDP = False
+UDP = True
 GROSS = False
 
 
@@ -44,11 +44,11 @@ def request_message_interval(message_id: int, frequency_hz: float):
 if platform == "win32":
     master = mavutil.mavlink_connection("COM4")
 elif UDP:
-    master = mavutil.mavlink_connection("udp:127.0.0.1:3000", baud=500000)
+    master = mavutil.mavlink_connection("udp:127.0.0.1:3000", baud=1000000)
 elif GROSS:
     master = mavutil.mavlink_connection("///dev/ttyACM0")
 else:
-    master = mavutil.mavlink_connection("/dev/serial0", baud=500000)
+    master = mavutil.mavlink_connection("/dev/serial0", baud=1000000)
     
 master.wait_heartbeat()
 print("Connected")
@@ -64,12 +64,13 @@ with open("identlog.pickle", 'wb') as f:
     while True:
         try:
             msg = master.recv_match(type=['ATTITUDE', 'ATTITUDE_TARGET', 'RC_CHANNELS_RAW',
-                                          'HEARTBEAT','SERVO_OUTPUT_RAW'], blocking=True)
-            pickle.dump(msg, f)
-            i += 1
-            if i > 1000:
-                print("saving...")
-                i = 0
+                                          'HEARTBEAT','SERVO_OUTPUT_RAW'], blocking=False)
+            if msg is not None:
+                pickle.dump(msg, f)
+                i += 1
+                if i > 1000:
+                    print("saving...")
+                    i = 0
         except KeyboardInterrupt:
             print("Program stopped")
             break
