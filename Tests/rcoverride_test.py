@@ -32,9 +32,10 @@ while time.time() - t < 10:
     master.mav.command_long_send(
         master.target_system,
         master.target_component,
-        mavutil.mavlink.MAV_CMD_DO_SET_ACTUATOR,
+        187,
         0,
         1, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan)
+    master.set_mode_px4("OFFBOARD", None, None)
     time.sleep(0.1)
 
 print("stopped override")    
@@ -44,7 +45,7 @@ master.mav.command_long_send(
     mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
     0,
     0, 0, 0, 0, 0, 0, 0)
-print("Waiting for the vehicle to arm")
+print("Waiting for the vehicle to disarm")
 master.motors_disarmed_wait()
 print('Disarmed!')
 
