@@ -22,6 +22,8 @@ print("stabilized mode")
 t = time.time()
 print("waiting")
 while time.time() - t < 5:
+    msg = master.recv_match(type="HEARTBEAT")
+    print(msg)
     pass
 
 master.set_mode_manual()
