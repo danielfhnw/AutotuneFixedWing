@@ -21,7 +21,7 @@ def set_servo_pwm(servo_n, microseconds):
         between 1100 and 1900 microseconds.
 
     """
-    master.set_servo(servo_n, microseconds) or:
+    master.set_servo(servo_n, microseconds)
     #master.mav.command_long_send(
     #    master.target_system, master.target_component,
     #    mavutil.mavlink.MAV_CMD_DO_SET_SERVO,
