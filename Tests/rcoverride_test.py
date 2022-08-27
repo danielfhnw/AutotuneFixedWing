@@ -29,7 +29,7 @@ def set_servo_pwm(servo_n, microseconds):
     #    servo_n,  # servo instance, offset by 8 MAIN outputs
     #    microseconds, # PWM pulse-width
     #    0,0,0,0,0     # unused parameters
-    )
+    #)
 
 
 master = mavutil.mavlink_connection("udp:127.0.0.1:3000", baud=500000)
