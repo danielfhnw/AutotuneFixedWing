@@ -6,11 +6,7 @@ Created on Tue Aug 16 14:36:07 2022
 """
 
 from pymavlink import mavutil
-from sys import platform
 import time
-
-
-UDP = True
 
 master = mavutil.mavlink_connection("udp:127.0.0.1:3000", baud=500000)
     
@@ -23,7 +19,8 @@ t = time.time()
 print("waiting")
 while time.time() - t < 5:
     msg = master.recv_match(type="HEARTBEAT")
-    print(msg)
+    if msg is not None:
+        print(msg)
     pass
 
 master.set_mode_manual()
