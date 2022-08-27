@@ -21,8 +21,7 @@ while time.time() - t < 10:
     msg = master.recv_match(type="HEARTBEAT")
     if msg is not None:
         print(msg)
-        if msg.type == 1 and msg.base_mode != 81:
-            master.set_mode(81, 458752)
+        master.set_mode(81, 458752)
 
 master.set_mode_manual()
 print("manual mode")
