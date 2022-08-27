@@ -34,7 +34,7 @@ while time.time() - t < 10:
         master.target_component,
         187,
         0,
-        1, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan)
+        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5)
     master.set_mode_px4("OFFBOARD", None, None)
     time.sleep(0.1)
 
