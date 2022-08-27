@@ -14,7 +14,7 @@ master.wait_heartbeat()
 
 #master.set_mode(81, 458752)
 #master.set_mode_fbwa()
-master.set_mode_px4("STABILIZED")
+master.set_mode_px4("STABILIZED", None, None)
 print("stabilized mode")
 
 t = time.time()
@@ -25,7 +25,7 @@ while time.time() - t < 10:
         print(msg)
 
 #master.set_mode_manual()
-master.set_mode_px4("MANUAL")
+master.set_mode_px4("MANUAL", None, None)
 print("manual mode")
 
 
