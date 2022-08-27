@@ -12,7 +12,7 @@ import time
 
 UDP = True
 
-master = mavutil.mavlink_connection("udp:127.0.0.1:3000", baud=1000000)
+master = mavutil.mavlink_connection("udp:127.0.0.1:3000", baud=500000)
     
 master.wait_heartbeat()
 
