@@ -12,7 +12,8 @@ master = mavutil.mavlink_connection("udp:127.0.0.1:3000", baud=500000)
     
 master.wait_heartbeat()
 
-master.set_mode(81, 458752)
+#master.set_mode(81, 458752)
+master.set_mode_fbwa()
 print("stabilized mode")
 
 t = time.time()
@@ -21,7 +22,6 @@ while time.time() - t < 10:
     msg = master.recv_match(type="HEARTBEAT")
     if msg is not None:
         print(msg)
-    master.set_mode(81, 458752)
 
 master.set_mode_manual()
 print("manual mode")
