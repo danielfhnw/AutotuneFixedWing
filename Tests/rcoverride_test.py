@@ -14,14 +14,16 @@ master.wait_heartbeat()
 
 t = time.time()
 print("starting override")
-master.mav.command_long_send(master.target_system, master.target_component,
-                                   70, 
+master.mav.rc_channels_override_send(master.target_system, master.target_component, 
                                    1100, 0, 0, 0, 0, 0, 0, 0)
 while time.time() - t < 10:
     pass
 
-master.mav.command_long_send(master.target_system, master.target_component,
-                                   mavutil.mavlink.RC_CHANNELS_OVERRIDE, 
+#master.mav.command_long_send(master.target_system, master.target_component,
+#                                   mavutil.mavlink.RC_CHANNELS_OVERRIDE, 
+#                                   0, 0, 0, 0, 0, 0, 0, 0)
+master.mav.rc_channels_override_send(master.target_system, master.target_component, 
                                    0, 0, 0, 0, 0, 0, 0, 0)
+
 print("stopped override")    
 master.close()
