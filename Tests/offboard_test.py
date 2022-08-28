@@ -31,7 +31,7 @@ while time.time() - t < 10:
     master.mav.set_attitude_target_send(
         time.time(), master.target_system,
         master.target_component,
-        192, # ignore throttle
+        0b011000000, # ignore throttle
         [0,0,0,0], # no quaternions
         0.5, 0, 0, # body roll 
         0, # thrust
