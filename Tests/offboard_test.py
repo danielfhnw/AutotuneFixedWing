@@ -27,7 +27,9 @@ print('Armed!')
 t = time.time()
 print("starting target send")
 
-while time.time() - t < 10:
+targetreached = True
+
+while targetreached:
     master.mav.set_attitude_target_send(
         int(time.time()), master.target_system,
         master.target_component,
@@ -37,7 +39,10 @@ while time.time() - t < 10:
         0, # thrust
         [0,0,0]) # no 3D thrust
     #master.set_mode_px4("OFFBOARD", None, None)
-    time.sleep(0.1)
+    msg = master.recv_match(type="ATTITUDE")
+    if msg is not None:
+        if msg.roll > 0.2:
+            targetreached = False
 
 print("stopped target send")    
 master.mav.command_long_send(
