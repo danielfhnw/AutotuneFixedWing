@@ -42,12 +42,12 @@ while targetreached and time.time()-starttime < 5 and not rc_in:
         0, # thrust
         [0,0,0]) # no 3D thrust
     #master.set_mode_px4("OFFBOARD", None, None)
-    msg = master.recv_match(type=["ATTITUDE", "RC_CHANNELS_RAW"])
+    msg = master.recv_match(type=["ATTITUDE", "RC_CHANNELS"])
     if msg is not None:
         if msg.get_type() == "ATTITUDE":
             if msg.roll > 0.2:
                 targetreached = False
-        elif msg.get_type() == "RC_CHANNELS_RAW":
+        elif msg.get_type() == "RC_CHANNELS":
             print(msg.chan3_raw)
             if msg.chan3_raw-1500 > 100 or msg.chan3_raw-1500 < (-100):
                 rc_in = True
