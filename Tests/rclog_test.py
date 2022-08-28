@@ -57,6 +57,9 @@ while True:
             print(f"\t\t\t{msg.roll}")
         elif msg.get_type() == "RC_CHANNELS":
             print(msg.chan3_raw)
+            if msg.chan3_raw > 1600:
+                print("canceled")
+                break
     except KeyboardInterrupt:
         print("Program stopped")
         break
