@@ -45,6 +45,7 @@ master.wait_heartbeat()
 print("Connected")
 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 1000)
 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW, 1000)
+request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_RC_CHANNELS, 100)
 print("changed message interval")
 
 i = 0
@@ -69,6 +70,7 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
                     elif msg.get_type() == "RC_CHANNELS":
                         if abs(msg.chan3_raw-1500) > 100:
                             finished = True
+                            master.set_mode_px4("MISSION", None, None)
                             print("aborted due to manual input")
                     if save:
                         pickle.dump(msg, f)
