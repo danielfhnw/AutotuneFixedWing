@@ -28,12 +28,9 @@ t = time.time()
 print("starting target send")
 
 while time.time() - t < 10:
-    master.mav.command_long_send(
-        master.target_system,
+    master.mav.set_attitude_send(
+        time.time(), master.target_system,
         master.target_component,
-        82,
-        0, # confirmation
-        time.time(), # timestamp
         192, # ignore throttle
         None, # no quaternions
         0.5, 0, 0, # body roll 
