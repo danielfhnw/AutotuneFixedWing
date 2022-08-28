@@ -28,8 +28,11 @@ t = time.time()
 print("starting target send")
 
 targetreached = True
+starttime = time.time()
+rc_in = False
 
-while targetreached:
+
+while targetreached and time.time()-starttime < 2 and not rc_in:
     master.mav.set_attitude_target_send(
         int(time.time()), master.target_system,
         master.target_component,
@@ -39,10 +42,14 @@ while targetreached:
         0, # thrust
         [0,0,0]) # no 3D thrust
     #master.set_mode_px4("OFFBOARD", None, None)
-    msg = master.recv_match(type="ATTITUDE")
+    msg = master.recv_match(type=["ATTITUDE", "RC_CHANNELS_RAW"])
     if msg is not None:
-        if msg.roll > 0.2:
-            targetreached = False
+        if msg.get_type() == "ATTITUDE":
+            if msg.roll > 0.2:
+                targetreached = False
+        elif msg.get_type() == "RC_CHANNELS_RAW":
+            if msg.chan3_raw-1500 > 100 or msg.chan3_raw-1500 < (-100):
+                rc_in = True
             
     master.set_mode_px4("OFFBOARD", None, None)
 
