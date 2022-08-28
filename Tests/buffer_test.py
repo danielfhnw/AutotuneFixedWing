@@ -46,7 +46,7 @@ else:
     master = mavutil.mavlink_connection("/dev/serial0", baud=57600)
     
 master.wait_heartbeat()
-request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE_TARGET, 1000)
+request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE_TARGET, 10)
 print("connected")
 
 while True:
