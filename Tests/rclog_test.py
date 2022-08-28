@@ -54,7 +54,7 @@ while True:
         msg = master.recv_match(type=['RC_CHANNELS', 'ATTITUDE'], blocking=True)
         if msg.get_type == "ATTITUDE":
             print(msg.roll)
-        else:
+        elif msg.get_type == "RC_CHANNELS":
             print(msg.chan3_raw)
     except KeyboardInterrupt:
         print("Program stopped")
