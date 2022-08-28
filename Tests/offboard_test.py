@@ -43,8 +43,13 @@ while targetreached:
     if msg is not None:
         if msg.roll > 0.2:
             targetreached = False
+            
+    master.set_mode_px4("OFFBOARD", None, None)
 
-print("stopped target send")    
+
+print("stopped target send")   
+master.set_mode_px4("MANUAL", None, None)
+print("set manual mode") 
 master.mav.command_long_send(
     master.target_system,
     master.target_component,
