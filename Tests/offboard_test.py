@@ -28,7 +28,7 @@ t = time.time()
 print("starting target send")
 
 while time.time() - t < 10:
-    master.mav.set_attitude_send(
+    master.mav.set_attitude_target_send(
         time.time(), master.target_system,
         master.target_component,
         192, # ignore throttle
