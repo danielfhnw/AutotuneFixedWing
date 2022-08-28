@@ -46,12 +46,16 @@ else:
     master = mavutil.mavlink_connection("/dev/serial0", baud=57600)
     
 master.wait_heartbeat()
+request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 1000)
 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_RC_CHANNELS, 1000)
 
 while True:
     try:
-        msg = master.recv_match(type='RC_CHANNELS', blocking=True)
-        print(msg.chan3_raw)
+        msg = master.recv_match(type=['RC_CHANNELS', 'ATTITUDE'], blocking=True)
+        if msg.get_type == "ATTITUDE":
+            print(msg.roll)
+        else:
+            print(msg.chan3_raw)
     except KeyboardInterrupt:
         print("Program stopped")
         break
