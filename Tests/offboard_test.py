@@ -50,6 +50,7 @@ while targetreached and time.time()-starttime < 2 and not rc_in:
         elif msg.get_type() == "RC_CHANNELS_RAW":
             if msg.chan3_raw-1500 > 100 or msg.chan3_raw-1500 < (-100):
                 rc_in = True
+                print(msg.chan3_raw)
             
     master.set_mode_px4("OFFBOARD", None, None)
 
