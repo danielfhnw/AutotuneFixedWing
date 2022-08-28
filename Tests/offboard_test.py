@@ -48,9 +48,9 @@ while targetreached and time.time()-starttime < 5 and not rc_in:
             if msg.roll > 0.2:
                 targetreached = False
         elif msg.get_type() == "RC_CHANNELS_RAW":
+            print(msg.chan3_raw)
             if msg.chan3_raw-1500 > 100 or msg.chan3_raw-1500 < (-100):
                 rc_in = True
-                print(msg.chan3_raw)
             
     master.set_mode_px4("OFFBOARD", None, None)
 
