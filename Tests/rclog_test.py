@@ -54,9 +54,9 @@ while True:
     try:
         msg = master.recv_match(type=['RC_CHANNELS', 'ATTITUDE'], blocking=True)
         if msg.get_type() == "ATTITUDE":
-            print(f"\t\t\t{msg.roll}")
+            #print(f"\t\t\t{msg.roll}")
         elif msg.get_type() == "RC_CHANNELS":
-            print(msg.chan3_raw)
+            #print(msg.chan3_raw)
             if msg.chan3_raw > 1600:
                 print("canceled")
                 break
