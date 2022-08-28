@@ -48,6 +48,7 @@ else:
 master.wait_heartbeat()
 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 1000)
 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_RC_CHANNELS, 1000)
+print("connected")
 
 while True:
     try:
