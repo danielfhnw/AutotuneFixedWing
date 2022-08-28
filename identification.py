@@ -78,8 +78,7 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
                         if i > 100:
                             print("saving...")
                             i = 0
-            if current_seq == 6:
-                offboard = True
+            if current_seq == 6 and not finished:
                 master.mav.set_attitude_target_send(
                     int(time.time()), master.target_system,
                     master.target_component,
