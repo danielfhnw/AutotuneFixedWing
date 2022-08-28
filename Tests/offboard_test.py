@@ -44,7 +44,7 @@ while targetreached and time.time()-starttime < 10 and not rc_in:
             0.5, 0, 0, # body roll 
             0.2, # thrust
             [0,0,0]) # no 3D thrust
-    #master.set_mode_px4("OFFBOARD", None, None)
+    master.set_mode_px4("OFFBOARD", None, None)
     msg = master.recv_match(type=["ATTITUDE", "RC_CHANNELS"])
     if msg is not None:
         if msg.get_type() == "ATTITUDE":
@@ -54,17 +54,6 @@ while targetreached and time.time()-starttime < 10 and not rc_in:
             if msg.chan3_raw-1500 > 100 or msg.chan3_raw-1500 < (-100):
                 rc_in = True
                 print("stopped due to manual input")
-                master.mav.set_attitude_target_send(
-                    int(time.time()), master.target_system,
-                    master.target_component,
-                    0b010000000, # ignore throttle
-                    [0,0,0,0], # no quaternions
-                    0, 0, 0, # body roll 
-                    0.2, # thrust
-                    [0,0,0]) # no 3D thrust
-            
-    master.set_mode_px4("OFFBOARD", None, None)
-
 
 print("stopped target send")   
 master.set_mode_px4("MANUAL", None, None)
