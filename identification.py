@@ -64,7 +64,7 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
                     if msg.get_type() == "SERVO_OUTPUT_RAW":
                         last_thrust = (msg.servo3_raw-1000)/1000
                     elif msg.get_type() == "ATTITUDE":
-                        if msg.roll > 0.3:
+                        if msg.roll > 0.2:
                             finished = True
                     elif msg.get_type() == "RC_CHANNELS":
                         if abs(msg.chan3_raw-1500) > 100:
@@ -76,7 +76,7 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
                         if i > 100:
                             print("saving...")
                             i = 0
-            if current_seq == 7:
+            if current_seq == 6:
                 offboard = True
                 master.mav.set_attitude_target_send(
                     int(time.time()), master.target_system,
@@ -91,7 +91,7 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
                     save = True
                     print("start saving")
             if finished:
-                master.waypoint_set_current_send(8)
+                master.waypoint_set_current_send(7)
                 print("set to loiter")
                 master.set_mode_px4("MISSION", None, None)
                 print("finished")
