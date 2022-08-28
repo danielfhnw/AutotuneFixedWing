@@ -32,7 +32,7 @@ starttime = time.time()
 rc_in = False
 
 
-while targetreached and time.time()-starttime < 5 and not rc_in:
+while targetreached and time.time()-starttime < 10 and not rc_in:
     master.mav.set_attitude_target_send(
         int(time.time()), master.target_system,
         master.target_component,
