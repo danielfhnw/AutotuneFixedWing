@@ -51,6 +51,7 @@ while targetreached and time.time()-starttime < 5 and not rc_in:
             print(msg.chan3_raw)
             if msg.chan3_raw-1500 > 100 or msg.chan3_raw-1500 < (-100):
                 rc_in = True
+                print("stopped due to manual input")
             
     master.set_mode_px4("OFFBOARD", None, None)
 
