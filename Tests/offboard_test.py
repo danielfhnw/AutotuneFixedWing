@@ -32,10 +32,10 @@ while time.time() - t < 10:
         time.time(), master.target_system,
         master.target_component,
         192, # ignore throttle
-        None, # no quaternions
+        [0,0,0,0], # no quaternions
         0.5, 0, 0, # body roll 
         0, # thrust
-        None) # no 3D thrust
+        [0,0,0]) # no 3D thrust
     #master.set_mode_px4("OFFBOARD", None, None)
     time.sleep(0.1)
 
