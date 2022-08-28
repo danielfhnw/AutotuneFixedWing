@@ -8,6 +8,7 @@ Created on Wed Aug 17 21:03:34 2022
 from pymavlink import mavutil
 from sys import platform
 import pickle
+import time
 
 
 UDP = True
@@ -15,16 +16,6 @@ GROSS = False
 
 
 def request_message_interval(message_id: int, frequency_hz: float):
-    """
-    Request MAVLink message in a desired frequency,
-    documentation for SET_MESSAGE_INTERVAL:
-        https://mavlink.io/en/messages/common.html#MAV_CMD_SET_MESSAGE_INTERVAL
-
-    Args:
-        message_id (int): MAVLink message ID
-        frequency_hz (float): Desired frequency in Hz
-    """
-
     if frequency_hz > 0:
         freq_out = 1e6 / frequency_hz
     elif frequency_hz == 0:
@@ -53,25 +44,59 @@ else:
 master.wait_heartbeat()
 print("Connected")
 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 1000)
-request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE_TARGET, 1000)
 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW, 1000)
-request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_RC_CHANNELS_RAW, 10)
-request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_HEARTBEAT, 10)
+print("changed message interval")
 
 i = 0
+last_thrust = 0
+current_seq = 0
+save = False
+finished = False
 
-with open("identlog.pickle", 'wb') as f:
-    while True:
+with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
+    while not finished:
         try:
-            msg = master.recv_match(type=['ATTITUDE', 'ATTITUDE_TARGET', 'RC_CHANNELS_RAW',
-                                          'HEARTBEAT','SERVO_OUTPUT_RAW'], blocking=False)
+            msg = master.recv_match(type=['ATTITUDE', 'RC_CHANNELS', 'SERVO_OUTPUT_RAW', 'MISSION_CURRENT'])
             if msg is not None:
-                pickle.dump(msg, f)
-                i += 1
-                if i > 1000:
-                    print("saving...")
-                    i = 0
+                if msg.get_type() == "MISSION_CURRENT":
+                    current_seq = msg.seq
+                else:
+                    if msg.get_type() == "SERVO_OUTPUT_RAW":
+                        last_thrust = (msg.servo3_raw-1000)/1000
+                    elif msg.get_type() == "ATTITUDE":
+                        if msg.roll > 0.3:
+                            finished = True
+                    elif msg.get_type() == "RC_CHANNELS":
+                        if abs(msg.chan3_raw-1500) > 100:
+                            finished = True
+                            print("aborted due to manual input")
+                    if save:
+                        pickle.dump(msg, f)
+                        i += 1
+                        if i > 100:
+                            print("saving...")
+                            i = 0
+            if current_seq == 7:
+                offboard = True
+                master.mav.set_attitude_target_send(
+                    int(time.time()), master.target_system,
+                    master.target_component,
+                    0b010000000, # ignore throttle and attitude
+                    [0,0,0,0], # no quaternions
+                    0.5, 0, 0, # body roll 
+                    last_thrust, # thrust
+                    [0,0,0]) # no 3D thrust
+                master.set_mode_px4("OFFBOARD", None, None)
+                if not save:
+                    save = True
+                    print("start saving")
+            if finished:
+                master.waypoint_set_current_send(8)
+                print("set to loiter")
+                master.set_mode_px4("MISSION", None, None)
+                print("finished")
         except KeyboardInterrupt:
+            master.set_mode_px4("MISSION", None, None)
             print("Program stopped")
             break
 
