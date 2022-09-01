@@ -43,6 +43,11 @@ else:
     
 master.wait_heartbeat()
 print("Connected")
+request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 10)
+request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW, 10)
+request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_RC_CHANNELS, 10)
+print("reset message interval")
+
 
 i = 0
 last_thrust = 0
@@ -51,6 +56,7 @@ finished = False
 lasttime = time.time()
 starttime = 0
 finishedtime = 0
+interval_change = True
 
 with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
     while True:
@@ -67,7 +73,6 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
                 elif msg.get_type() == "RC_CHANNELS":
                     if abs(msg.chan3_raw-1500) > 100:
                         finished = True
-                        master.set_mode_px4("MISSION", None, None)
                         print("aborted due to manual input")
                 pickle.dump(msg, f)
                 i += 1
@@ -75,11 +80,12 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
                     print("saving...")
                     i = 0
                         
-            if current_seq == 5:
+            if current_seq == 5 and interval_change:
                 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 1000)
                 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW, 1000)
                 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_RC_CHANNELS, 100)
                 print("changed message interval")
+                interval_change = False
             elif current_seq == 6 and time.time()-lasttime > 0.1:
                 lasttime = time.time()
                 if starttime == 0:
@@ -95,19 +101,22 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
                     last_thrust, # thrust
                     [0,0,0]) # no 3D thrust
                 master.set_mode_px4("OFFBOARD", None, None)
-            
-            if finished:
-                master.waypoint_set_current_send(7)
-                print("set to loiter")
-                master.set_mode_px4("MISSION", None, None)
+            elif current_seq == 7 and not interval_change:
                 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 10)
                 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW, 10)
                 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_RC_CHANNELS, 10)
                 print("reset message interval")
+                interval_change = True
+                
+            if finished:
+                master.waypoint_set_current_send(7)
+                print("set to loiter")
+                master.set_mode_px4("MISSION", None, None)
                 print("waiting for storage...")
-                if finishedtime == 0:
-                    finishedtime = time.time()
-                if time.time() - finishedtime > 5:
+                finishedtime = time.time()
+                finished = False
+                
+            if finishedtime != 0 and time.time() - finishedtime > 5:
                     print("finished")
                     break
                 
