@@ -68,10 +68,10 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
                 elif msg.get_type() == "SERVO_OUTPUT_RAW":
                     last_thrust = (msg.servo3_raw-1000)/1000
                 elif msg.get_type() == "ATTITUDE":
-                    if msg.roll > 0.2:
+                    if msg.roll > 0.2 and finishedtime == 0:
                         finished = True
                 elif msg.get_type() == "RC_CHANNELS":
-                    if abs(msg.chan3_raw-1500) > 100:
+                    if abs(msg.chan3_raw-1500) > 100 and finishedtime == 0:
                         finished = True
                         print("aborted due to manual input")
                 pickle.dump(msg, f)
