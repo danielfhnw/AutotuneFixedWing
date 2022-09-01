@@ -39,63 +39,78 @@ elif UDP:
 elif GROSS:
     master = mavutil.mavlink_connection("///dev/ttyACM0")
 else:
-    master = mavutil.mavlink_connection("/dev/serial0", baud=1000000)
+    master = mavutil.mavlink_connection("/dev/serial0", baud=500000)
     
 master.wait_heartbeat()
 print("Connected")
-request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 1000)
-request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW, 1000)
-request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_RC_CHANNELS, 100)
-print("changed message interval")
 
 i = 0
 last_thrust = 0
 current_seq = 0
-save = False
 finished = False
+lasttime = time.time()
+starttime = 0
+finishedtime = 0
 
 with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
-    while not finished:
+    while True:
         try:
             msg = master.recv_match(type=['ATTITUDE', 'RC_CHANNELS', 'SERVO_OUTPUT_RAW', 'MISSION_CURRENT'])
             if msg is not None:
                 if msg.get_type() == "MISSION_CURRENT":
                     current_seq = msg.seq
-                else:
-                    if msg.get_type() == "SERVO_OUTPUT_RAW":
-                        last_thrust = (msg.servo3_raw-1000)/1000
-                    elif msg.get_type() == "ATTITUDE":
-                        if msg.roll > 0.2:
-                            finished = True
-                    elif msg.get_type() == "RC_CHANNELS":
-                        if abs(msg.chan3_raw-1500) > 100:
-                            finished = True
-                            master.set_mode_px4("MISSION", None, None)
-                            print("aborted due to manual input")
-                    if save:
-                        pickle.dump(msg, f)
-                        i += 1
-                        if i > 100:
-                            print("saving...")
-                            i = 0
-            if current_seq == 6 and not finished:
+                elif msg.get_type() == "SERVO_OUTPUT_RAW":
+                    last_thrust = (msg.servo3_raw-1000)/1000
+                elif msg.get_type() == "ATTITUDE":
+                    if msg.roll > 0.2:
+                        finished = True
+                elif msg.get_type() == "RC_CHANNELS":
+                    if abs(msg.chan3_raw-1500) > 100:
+                        finished = True
+                        master.set_mode_px4("MISSION", None, None)
+                        print("aborted due to manual input")
+                pickle.dump(msg, f)
+                i += 1
+                if i > 100:
+                    print("saving...")
+                    i = 0
+                        
+            if current_seq == 5:
+                request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 1000)
+                request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW, 1000)
+                request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_RC_CHANNELS, 100)
+                print("changed message interval")
+            elif current_seq == 6 and time.time()-lasttime > 0.1:
+                lasttime = time.time()
+                if starttime == 0:
+                    starttime = time.time()
+                if time.time() - starttime > 1:
+                    finished = True
                 master.mav.set_attitude_target_send(
                     int(time.time()), master.target_system,
                     master.target_component,
-                    0b010000000, # ignore throttle and attitude
+                    0b010000000, # ignore attitude
                     [0,0,0,0], # no quaternions
                     0.5, 0, 0, # body roll 
                     last_thrust, # thrust
                     [0,0,0]) # no 3D thrust
                 master.set_mode_px4("OFFBOARD", None, None)
-                if not save:
-                    save = True
-                    print("start saving")
+            
             if finished:
                 master.waypoint_set_current_send(7)
                 print("set to loiter")
                 master.set_mode_px4("MISSION", None, None)
-                print("finished")
+                request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 10)
+                request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW, 10)
+                request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_RC_CHANNELS, 10)
+                print("reset message interval")
+                print("waiting for storage...")
+                if finishedtime == 0:
+                    finishedtime = time.time()
+                if time.time() - finishedtime > 5:
+                    print("finished")
+                    break
+                
         except KeyboardInterrupt:
             master.set_mode_px4("MISSION", None, None)
             print("Program stopped")
