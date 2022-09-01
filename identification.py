@@ -90,7 +90,7 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
                 lasttime = time.time()
                 if starttime == 0:
                     starttime = time.time()
-                if time.time() - starttime > 1:
+                if time.time() - starttime > 1 and finishedtime == 0:
                     finished = True
                 master.mav.set_attitude_target_send(
                     int(time.time()), master.target_system,
