@@ -90,8 +90,9 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
             elif current_seq == 6:
                 if starttime == 0:
                     starttime = time.time()
-                if time.time() - starttime > 1 and finishedtime == 0:
-                    finished = True
+                if time.time() - starttime > 1:
+                    if finishedtime == 0:
+                        finished = True
                     master.set_mode_px4("MISSION", None, None)
                 else:
                     master.set_mode_px4("OFFBOARD", None, None)
