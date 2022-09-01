@@ -87,11 +87,12 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
                 print("changed message interval")
                 interval_change = False
             elif current_seq == 6:
+                master.set_mode_px4("OFFBOARD", None, None)
                 if starttime == 0:
                     starttime = time.time()
                 if time.time() - starttime > 1 and finishedtime == 0:
                     finished = True
-                master.set_mode_px4("OFFBOARD", None, None)
+                    master.set_mode_px4("MISSION", None, None)
             elif current_seq == 7 and not interval_change:
                 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 10)
                 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW, 10)
