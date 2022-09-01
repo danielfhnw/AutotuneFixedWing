@@ -86,12 +86,21 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
                 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_RC_CHANNELS, 100)
                 print("changed message interval")
                 interval_change = False
-            elif current_seq == 6 and time.time()-lasttime > 0.1:
-                lasttime = time.time()
+            elif current_seq == 6:
                 if starttime == 0:
                     starttime = time.time()
                 if time.time() - starttime > 1 and finishedtime == 0:
                     finished = True
+                master.set_mode_px4("OFFBOARD", None, None)
+            elif current_seq == 7 and not interval_change:
+                request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 10)
+                request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW, 10)
+                request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_RC_CHANNELS, 10)
+                print("reset message interval")
+                interval_change = True
+            
+            if time.time()-lasttime > 0.1:
+                lasttime = time.time()
                 master.mav.set_attitude_target_send(
                     int(time.time()), master.target_system,
                     master.target_component,
@@ -100,14 +109,7 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
                     0.5, 0, 0, # body roll 
                     last_thrust, # thrust
                     [0,0,0]) # no 3D thrust
-                master.set_mode_px4("OFFBOARD", None, None)
-            elif current_seq == 7 and not interval_change:
-                request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 10)
-                request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW, 10)
-                request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_RC_CHANNELS, 10)
-                print("reset message interval")
-                interval_change = True
-                
+            
             if finished:
                 master.waypoint_set_current_send(7)
                 print("set to loiter")
