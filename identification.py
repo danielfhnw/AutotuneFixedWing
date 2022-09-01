@@ -118,8 +118,7 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
             if finished:
                 master.waypoint_set_current_send(7)
                 print("set to loiter")
-                for i in range(100):
-                    master.set_mode_px4("MISSION", None, None)
+                master.set_mode_px4("MISSION", None, None)
                 print("waiting for storage...")
                 finishedtime = time.time()
                 finished = False
