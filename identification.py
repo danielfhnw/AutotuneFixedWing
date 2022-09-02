@@ -100,7 +100,7 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
                 else:
                     master.set_mode_px4("OFFBOARD", None, None)
             elif current_seq == 7 and not interval_change:
-                if steps_i < len(steps-1):
+                if steps_i < len(steps)-1:
                     steps_i += 1
                     print(f"rates setpoint for next round: {steps[steps_i]}")
                 else:
