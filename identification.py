@@ -51,6 +51,13 @@ print("reset message interval")
 
 
 i = 0
+steps_i = 0
+steps = [[0.5, 0, 0],
+         [-0.5, 0, 0],
+         [0, 0.5, 0],
+         [0, -0.5, 0],
+         [0, 0, 0.5],
+         [0, 0, -0.5]]
 last_thrust = 0
 current_seq = 0
 finished = False
@@ -69,10 +76,9 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
                 elif msg.get_type() == "SERVO_OUTPUT_RAW":
                     last_thrust = (msg.servo3_raw-1000)/1000
                 elif msg.get_type() == "ATTITUDE":
-                    if msg.roll > 0.2 and finishedtime == 0:
-                        finished = True
+                    pass
                 elif msg.get_type() == "RC_CHANNELS":
-                    if abs(msg.chan3_raw-1500) > 100 and finishedtime == 0:
+                    if abs(msg.chan4_raw-1500) > 100 and finishedtime == 0:
                         finished = True
                         print("aborted due to manual input")
                 pickle.dump(msg, f)
@@ -84,23 +90,22 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
             if current_seq == 5 and interval_change:
                 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 1000)
                 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW, 1000)
-                request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_RC_CHANNELS, 100)
                 print("changed message interval")
                 interval_change = False
             elif current_seq == 6:
                 if starttime == 0:
                     starttime = time.time()
                 if time.time() - starttime > 1:
-                    if finishedtime == 0:
-                        finished = True
                     master.set_mode_px4("MISSION", None, None)
                 else:
                     master.set_mode_px4("OFFBOARD", None, None)
             elif current_seq == 7 and not interval_change:
-                lasttime = math.inf
+                if steps_i < len(steps-1):
+                    steps_i += 1
+                else:
+                    finished = True
                 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 10)
                 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_SERVO_OUTPUT_RAW, 10)
-                request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_RC_CHANNELS, 10)
                 print("reset message interval")
                 interval_change = True
             
@@ -111,12 +116,13 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
                     master.target_component,
                     0b010000000, # ignore attitude
                     [0,0,0,0], # no quaternions
-                    0.5, 0, 0, # body roll 
+                    *steps[steps_i], # angular rates setpoints 
                     last_thrust, # thrust
                     [0,0,0]) # no 3D thrust
             
             if finished:
-                master.waypoint_set_current_send(7)
+                lasttime = math.inf
+                master.waypoint_set_current_send(9)
                 print("set to loiter")
                 master.set_mode_px4("MISSION", None, None)
                 print("waiting for storage...")
