@@ -135,8 +135,9 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
                     break
                 
         except KeyboardInterrupt:
+            master.waypoint_set_current_send(9)
             master.set_mode_px4("MISSION", None, None)
-            print("Program stopped")
+            print("Program stopped due to keyboard interrupt")
             break
 
 master.close()
