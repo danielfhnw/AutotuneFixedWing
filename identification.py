@@ -103,6 +103,7 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
                 if steps_i < len(steps)-1:
                     steps_i += 1
                     print(f"rates setpoint for next round: {steps[steps_i]}")
+                    starttime = 0
                 else:
                     finished = True
                 request_message_interval(mavutil.mavlink.MAVLINK_MSG_ID_ATTITUDE, 10)
