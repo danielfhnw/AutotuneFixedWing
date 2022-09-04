@@ -126,6 +126,7 @@ for n in range(300):
 plt.figure(5)
 plt.title("Simulationsergebnisse")
 plt.xlabel("Zeitschritte")
-plt.ylabel("Drehgeschwindigkeit [m/s]")
+plt.ylabel("Drehgeschwindigkeit [rad/s]")
+plt.grid(True)
 plt.plot(y_step)
 plt.plot(soll*np.ones(len(y_step)))
