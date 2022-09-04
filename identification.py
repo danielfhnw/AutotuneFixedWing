@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Aug 17 21:03:34 2022
-
-@author: ma1012017
-"""
 
 from pymavlink import mavutil
 from sys import platform

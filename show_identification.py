@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Aug 17 22:21:17 2022
-
-@author: ma1012017
-"""
 
 import pickle
-from matplotlib import pyplot as plt
 import numpy as np
+from matplotlib import pyplot as plt
+from sklearn.linear_model import LinearRegression
 
 
 def pickleLoader(pklFile):
@@ -17,40 +13,96 @@ def pickleLoader(pklFile):
     except EOFError:
         pass
 
+lower_t = 155500
+upper_t = 157300
+dt = 20
+axis = "ROLL"
 
-roll = []
+velocity = []
 time = []
 servo = []
 time2 = []
-types = []
 
 with open("Logs/160811.pickle", "rb") as fp:
     for msg in pickleLoader(fp):
         if msg.get_type() == "ATTITUDE":
-            roll.append(msg.rollspeed)
+            if axis == "ROLL":    
+                velocity.append(msg.rollspeed)
+            elif axis == "PITCH":
+                velocity.append(msg.pitchspeed)
+            elif axis == "YAW":
+                velocity.append(msg.yawspeed)
             time.append(msg.time_boot_ms)
         elif msg.get_type() == "SERVO_OUTPUT_RAW":
-            servo.append(msg.servo1_raw)
+            if axis == "ROLL":
+                servo.append(msg.servo1_raw)
+            elif axis == "PITCH":
+                servo.append(msg.servo3_raw)
+            elif axis == "YAW":
+                servo.append(msg.servo4_raw)
             time2.append(msg.time_usec)
-        elif msg.get_type() == "HEARTBEAT":
-            print(msg)
-        types.append(msg.get_type())
             
-for i,(t,s) in enumerate(zip(time2,servo)):
-    time2[i] = t/1000
-    servo[i] = (s-1000)/1000
-
-plt.plot(time,roll,'.')
+plt.figure(0)
+plt.plot(time,velocity,'.')
 plt.plot(time2,servo,'.')
 plt.grid(True)
+plt.xlim([lower_t, upper_t])
+plt.ylim([-3, 2])
+plt.show()
+plt.figure(1)
+plt.plot(time,velocity,'.')
+plt.plot(time2,servo,'.')
+plt.grid(True)
+plt.xlim([lower_t*1000, upper_t*1000])
+plt.ylim([0, 2000])
+plt.show()
+            
+#%% Skalierung
+
+for i,(t,s) in enumerate(zip(time2,servo)):
+    time2[i] = t/1000
+    servo[i] = (s-1500)/(-500)
+
+plt.figure(2)
+plt.plot(time,velocity,'.')
+plt.plot(time2,servo,'.')
+plt.grid(True)
+plt.xlim([lower_t, upper_t])
+plt.ylim([-3, 2])
 plt.show()
 
-#%% 
+#%% Resampling
 
-diff = time[-1] - time[0]
-print(len(roll)/(diff/1000))
+time_res = np.arange(lower_t, upper_t, dt)
+velocity_res = np.interp(time_res, time, velocity)
+servo_res = np.interp(time_res, time2, servo)
 
-diff = time2[-1] - time2[0]
-print(len(servo)/(diff/1000))
+plt.figure(3)
+plt.plot(time_res,velocity_res,'.')
+plt.plot(time_res,servo_res,'.')
+plt.grid(True)
+plt.ylim([-3, 2])
+plt.show()
 
-#print(types)
+#%% ARX Modell
+
+velocity_res = np.expand_dims(velocity_res, axis=1)
+servo_res = np.expand_dims(servo_res, axis=1)
+
+y = velocity_res[2:]
+
+X = np.concatenate([velocity_res[1:-1], velocity_res[:-2], servo_res[2:], servo_res[1:-1], servo_res[:-2]], axis=1)
+#X = np.concatenate([velocity_res[1:-1], servo_res[2:]], axis=1)
+
+lr = LinearRegression().fit(X, y)
+
+print(lr.coef_)
+
+y_pred = lr.predict(X)
+
+plt.figure(4)
+plt.plot(time_res[2:],y,'-')
+plt.plot(time_res[2:],y_pred,'*')
+plt.grid(True)
+plt.ylim([-3, 2])
+plt.show()

@@ -13,7 +13,7 @@ ur = np.concatenate([100*np.ones([100,1]), np.zeros([200,1])])
 up = np.concatenate([np.zeros([100,1]), 100*np.ones([100,1]), np.zeros([100,1])])
 uy = np.concatenate([np.zeros([200,1]), 100*np.ones([100,1])])
 
-yr = np.zeros([300,1])
+yr = np.zeros(300)
 yp = np.zeros([300,1])
 yy = np.zeros([300,1])
 
@@ -35,6 +35,8 @@ for i in range(299):
     else:
         yr[i] = a1*yr[i-1] + a2*yr[i-2] + b0*ur[i] + b1*ur[i-1] + b2*ur[i-2] + er[i]
         
+
+yr = np.expand_dims(yr, axis=1)
 
 plt.figure(1)
 plt.plot(ur)
