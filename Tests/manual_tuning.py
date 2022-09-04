@@ -51,9 +51,9 @@ while not reset:
             if msg.custom_mode != 65312:
                 print(msg.custom_mode)
                 reset = True
-                master.param_set_send("FW_RR_FF", 0.4)
-                master.param_set_send("FW_RR_FF", 0.4)
-                master.param_set_send("FW_RR_FF", 0.4)
+                #master.param_set_send("FW_RR_FF", 0.4)
+                #master.param_set_send("FW_RR_P", 0.01)
+                #master.param_set_send("FW_RR_I", 0.01)
                 print("reset parameters")
 
 master.close()
