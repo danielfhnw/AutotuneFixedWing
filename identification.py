@@ -73,7 +73,7 @@ with open(time.strftime("%H%M%S.pickle"), 'wb') as f:
                 elif msg.get_type() == "ATTITUDE":
                     pass
                 elif msg.get_type() == "RC_CHANNELS":
-                    if abs(msg.chan4_raw-1500) > 100 and finishedtime == 0:
+                    if abs(msg.chan4_raw-1500) > 250 and finishedtime == 0:
                         finished = True
                         print("aborted due to manual input")
                 pickle.dump(msg, f)
