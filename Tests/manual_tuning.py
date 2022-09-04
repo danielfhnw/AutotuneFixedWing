@@ -50,9 +50,9 @@ while not reset:
         if msg.get_type() == 'HEARTBEAT':
             if msg.custom_mode != 67371008 and msg.autopilot == 12:
                 reset = True
-                #master.param_set_send("FW_RR_FF", 0.4)
-                #master.param_set_send("FW_RR_P", 0.01)
-                #master.param_set_send("FW_RR_I", 0.01)
+                master.param_set_send("FW_RR_FF", 0.5)
+                master.param_set_send("FW_RR_P", 0.05)
+                master.param_set_send("FW_RR_I", 0.1)
                 print("reset parameters")
 
 master.close()
