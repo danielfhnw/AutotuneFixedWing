@@ -48,9 +48,8 @@ while not reset:
     msg = master.recv_match(type=['HEARTBEAT'])
     if msg is not None:
         if msg.get_type() == 'HEARTBEAT':
-            if msg.custom_mode != 65312:
-                print(msg.custom_mode)
-                #reset = True
+            if msg.custom_mode != 67371008 and msg.autopilot == 12:
+                reset = True
                 #master.param_set_send("FW_RR_FF", 0.4)
                 #master.param_set_send("FW_RR_P", 0.01)
                 #master.param_set_send("FW_RR_I", 0.01)
